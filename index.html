@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Flash USDT • Premium Sale</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg1:#070a15; --bg2:#0f1630; --glass:rgba(255,255,255,.06); --stroke:rgba(255,255,255,.14);
+    --text:#eaf2ff; --muted:#9fb0ce; --neo:#00e0ff; --neo2:#6a57ff; --ok:#1ee2a2; --warn:#ffd369; --err:#ff6b81;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{
+    margin:0; color:var(--text); font-family:Poppins,system-ui,Segoe UI,Inter,Roboto,Arial;
+    background:
+      radial-gradient(1100px 700px at 12% 0%, rgba(0,224,255,.16), transparent 60%),
+      radial-gradient(950px 650px at 88% 10%, rgba(106,87,255,.14), transparent 60%),
+      linear-gradient(180deg,var(--bg1),var(--bg2) 55%, #0a0f1a);
+    overflow-x:hidden;
+  }
+  .glow{position:fixed; inset:0; pointer-events:none; z-index:-1;
+    background:
+      radial-gradient(700px 320px at 20% 8%, rgba(0,224,255,.22), transparent 60%),
+      radial-gradient(820px 360px at 80% 16%, rgba(106,87,255,.22), transparent 60%),
+      radial-gradient(900px 520px at 50% 120%, rgba(30,226,162,.12), transparent 60%);
+    filter: blur(10px);
+  }
+  .wrap{width:min(1200px,96vw); margin:24px auto 60px; padding:0 14px}
+  /* NAV */
+  .nav{
+    display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    border:1px solid var(--stroke); border-radius:18px; padding:12px 16px; backdrop-filter:blur(14px);
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
+  }
+  .brand{display:flex; align-items:center; gap:12px}
+  .logo{
+    width:50px; height:50px; border-radius:14px; display:grid; place-items:center;
+    background:
+      radial-gradient(circle at 30% 30%, var(--neo), transparent 60%),
+      radial-gradient(circle at 70% 70%, var(--neo2), transparent 60%),
+      linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.04));
+    box-shadow:0 0 24px rgba(0,224,255,.25), inset 0 0 28px rgba(106,87,255,.16);
+  }
+  .brand h1{margin:0; font-size:1.18rem; letter-spacing:.3px}
+  .tag{color:var(--muted); font-size:.92rem}
+  .btn{
+    position:relative; border:1px solid var(--stroke); background:rgba(255,255,255,.08); color:#fff;
+    padding:12px 16px; border-radius:12px; font-weight:800; cursor:pointer; transition:.18s transform,.22s box-shadow,.22s background;
+    text-shadow:0 0 18px rgba(0,224,255,.18);
+  }
+  .btn:hover{ transform:translateY(-1px); box-shadow:0 12px 28px rgba(0,224,255,.18)}
+  .btn-neo{
+    border:0; background:linear-gradient(135deg, var(--neo), var(--neo2));
+    box-shadow: 0 0 0 2px rgba(255,255,255,.08) inset, 0 10px 26px rgba(6,217,255,.18), 0 0 22px rgba(106,87,255,.18);
+  }
+  .btn-danger{
+    border:0; background:linear-gradient(135deg, #ff6b81, #ff3b5c);
+    box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset, 0 10px 26px rgba(255,59,92,.22);
+  }
+  .btn[disabled]{opacity:.55; cursor:not-allowed; filter:grayscale(20%)}
+  /* HERO */
+  .hero{
+    margin:16px 0 18px; padding:14px 16px; border-radius:14px; border:1px solid var(--stroke);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .hero .info{font-weight:800; color:var(--warn)}
+  /* GRID */
+  .grid{display:grid; grid-template-columns:1.2fr .8fr; gap:14px; margin-top:12px}
+  .panel{border:1px solid var(--stroke); border-radius:16px; padding:14px; background:var(--glass); backdrop-filter:blur(10px)}
+  .label{opacity:.85; font-size:.9rem; margin-bottom:6px}
+  .field{min-height:42px; display:flex; align-items:center; border-radius:10px; padding:10px 12px;
+         border:1px dashed rgba(255,255,255,.18); font-family:ui-monospace,Menlo,monospace; overflow:auto}
+  .inp{width:100%; height:44px; border-radius:10px; border:1px dashed rgba(255,255,255,.18);
+       background:rgba(255,255,255,.04); color:#fff; padding:10px 12px; font-family:ui-monospace,Menlo,monospace}
+  .inp.valid{ outline:2px solid rgba(30,226,162,.55); }
+  .inp.invalid{ outline:2px solid rgba(255,107,129,.6); }
+  .help{ font-size:.85rem; margin-top:6px; color:var(--muted) }
+  .help.ok{ color:var(--ok) }
+  .help.err{ color:var(--err) }
+  .hr{height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent); margin:18px 0}
+  /* PACKAGES */
+  .packages{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px }
+  .card{
+    position:relative; padding:16px; border-radius:16px; border:1px solid var(--stroke);
+    background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06), 0 22px 60px rgba(0,0,0,.35);
+    transition:.2s transform,.25s box-shadow;
+  }
+  .card:hover{ transform:translateY(-6px); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08), 0 26px 80px rgba(0,0,0,.45) }
+  .badge{
+    position:absolute; top:12px; right:12px; font-size:.78rem; padding:6px 10px; border-radius:999px;
+    background: rgba(30,226,162,.12); color: var(--ok); border:1px solid rgba(30,226,162,.35);
+  }
+  .pkgTitle{display:flex; align-items:center; gap:10px; font-weight:900; margin-bottom:8px}
+  .pkgDesc{opacity:.92; font-size:.97rem; margin-bottom:10px}
+  .price{font-weight:900; color:var(--warn)}
+  .cta{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:12px}
+  .buy{
+    width:100%; padding:12px 14px; font-weight:900; cursor:pointer; border:0; border-radius:12px;
+    background:linear-gradient(135deg, var(--neo), var(--neo2));
+    color:#0b1420; box-shadow:0 10px 26px rgba(6,217,255,.18), 0 0 22px rgba(106,87,255,.18);
+    transition:.15s transform,.18s filter;
+  }
+  .buy:hover{ transform:translateY(-1px) }
+  .buy[disabled]{opacity:.55; cursor:not-allowed; filter:grayscale(20%)}
+  .foot{margin:22px 4px 0; text-align:center; color:var(--muted); font-size:.92rem}
+  @media (max-width:980px){ .grid{grid-template-columns:1fr} .packages{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+
+<div class="wrap">
+  <div class="nav">
+    <div class="brand">
+      <div class="logo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 2L21 7v10l-9 5-9-5V7l9-5z" stroke="white" stroke-opacity=".9"/>
+          <path d="M12 6v12M8 8l8 4-8 4" stroke="url(#g)" stroke-width="1.6"/>
+          <defs><linearGradient id="g" x1="0" y1="0" x2="20" y2="20"><stop stop-color="#00e0ff"/><stop offset="1" stop-color="#6a57ff"/></linearGradient></defs>
+        </svg>
+      </div>
+      <div>
+        <h1>Flash USDT • Premium Sale</h1>
+        <div class="tag" id="netInfo">Not connected</div>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn btn-neo" id="connectBtn">💳 Connect MetaMask</button>
+      <button class="btn btn-danger" id="disconnectBtn" disabled>🔌 Disconnect</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="info">ETH → Treasury • TRC20 USDT</div>
+    <div class="tag">Payments go to treasury; TRC20 delivery </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="label">Connected Account</div>
+      <div id="addr" class="field">-</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px">
+        <div>
+          <div class="label">Network</div>
+          <div id="chain" class="field">-</div>
+        </div>
+        <div>
+          <div class="label">ETH Balance</div>
+          <div id="ethbal" class="field">-</div>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="label">TRC20 USDT Delivery Address (required)</div>
+        <input id="trc20" class="inp" placeholder="T... (TRON address)">
+        <div id="trc20-help" class="help"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="label">Status</div>
+      <div id="status" class="field">Not connected</div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="packages">
+    <div class="card">
+      <div class="badge">Popular</div>
+      <div class="pkgTitle">🟡 Package #1</div>
+      <div class="pkgDesc">50,000 USDT (TRC20 FLAŞ USDT)</div>
+      <div class="cta">
+        <div class="price">1.369 ETH</div>
+        <button class="buy buy-mm" data-id="1" data-eth="1.369">Buy</button>
+        <div id="qr-1" style="margin-top:10px;display:flex;justify-content:center"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="pkgTitle">🟣 Package #2</div>
+      <div class="pkgDesc">100,000 USDT (TRC20 FLAŞ USDT)</div>
+      <div class="cta">
+        <div class="price">2.738 ETH</div>
+        <button class="buy buy-mm" data-id="2" data-eth="2.738">Buy</button>
+        <div id="qr-2" style="margin-top:10px;display:flex;justify-content:center"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="pkgTitle">🔵 Package #3</div>
+      <div class="pkgDesc">150,000 USDT (TRC20 FLAŞ USDT)</div>
+      <div class="cta">
+        <div class="price">4.107 ETH</div>
+        <button class="buy buy-mm" data-id="3" data-eth="4.107">Buy</button>
+        <div id="qr-3" style="margin-top:10px;display:flex;justify-content:center"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 style="text-align:center;margin:20px 0;">Direct Pay (QR + TRC20)</h2>
+  <div class="packages">
+    <div class="card">
+      <div class="badge">Direct Pay</div>
+      <div class="pkgTitle">🟡 Package #1</div>
+      <div class="pkgDesc">50,000 USDT (TRC20 FLAŞ USDT)</div>
+      <div class="label">TRC20 USDT Delivery Address (required)</div>
+      <input id="trc20-qr-1" class="inp" placeholder="T... (TRON address)">
+      <div id="trc20-qr-1-help" class="help"></div>
+      <div class="cta">
+        <div class="price">1.369 ETH</div>
+        <button class="buy buy-qr" id="buy-qr-1" data-pkg="1" data-eth="1.369" disabled>Buy (Pay with QR Code)</button>
+      </div>
+      <div id="qr-direct-1" style="margin-top:10px;display:none;justify-content:center"></div>
+    </div>
+
+    <div class="card">
+      <div class="badge">Direct Pay</div>
+      <div class="pkgTitle">🟣 Package #2</div>
+      <div class="pkgDesc">100,000 USDT (TRC20 FLAŞ USDT)</div>
+      <div class="label">TRC20 USDT Delivery Address (required)</div>
+      <input id="trc20-qr-2" class="inp" placeholder="T... (TRON address)">
+      <div id="trc20-qr-2-help" class="help"></div>
+      <div class="cta">
+        <div class="price">2.738 ETH</div>
+        <button class="buy buy-qr" id="buy-qr-2" data-pkg="2" data-eth="2.738" disabled>Buy (Pay with QR Code)</button>
+      </div>
+      <div id="qr-direct-2" style="margin-top:10px;display:none;justify-content:center"></div>
+    </div>
+
+    <div class="card">
+      <div class="badge">Direct Pay</div>
+      <div class="pkgTitle">🔵 Package #3</div>
+      <div class="pkgDesc">150,000 USDT (TRC20 FLAŞ USDT)</div>
+      <div class="label">TRC20 USDT Delivery Address (required)</div>
+      <input id="trc20-qr-3" class="inp" placeholder="T... (TRON address)">
+      <div id="trc20-qr-3-help" class="help"></div>
+      <div class="cta">
+        <div class="price">4.107 ETH</div>
+        <button class="buy buy-qr" id="buy-qr-3" data-pkg="3" data-eth="4.107" disabled>Buy (Pay with QR Code)</button>
+      </div>
+      <div id="qr-direct-3" style="margin-top:10px;display:none;justify-content:center"></div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="stockbar-wrap" style="margin-top:40px;margin-bottom:20px;padding:20px 0;
+             width:100%;background:rgba(255,255,255,.04);backdrop-filter:blur(8px);
+             border-top:1px solid var(--stroke);border-bottom:1px solid var(--stroke);
+             border-radius:14px;box-shadow:0 0 20px rgba(0,224,255,.08) inset">
+    <div class="wrap">
+      <div class="label" style="margin-bottom:10px;font-size:1.05rem;font-weight:800">
+        TRC20 FLASH USDT STOCK
+      </div>
+      <div style="display:flex;justify-content:space-between;font-weight:800;margin-bottom:10px;font-size:1.05rem">
+        <div id="stockValue">3,628,387,000</div>
+        <div id="stockPercent">100%</div>
+      </div>
+      <div style="height:28px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08);
+                 border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)">
+        <div id="stockFill" style="height:100%;width:100%;background:linear-gradient(90deg,#00e0ff,#6a57ff);
+                 box-shadow:inset 0 0 24px rgba(0,224,255,.25);transition:width .6s ease"></div>
+      </div>
+      <div id="stockNote" style="color:#9fb0ce;margin-top:8px;font-size:.95rem"></div>
+    </div>
+  </div>
+
+  <div class="foot">© 2025 Flash USDT. All rights reserved.</div>
+</div>
+
+<div id="qrModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:1000;">
+  <div style="background:#fff;padding:20px;border-radius:10px;position:relative;max-width:340px;text-align:center;color:#0b1420;">
+    <span id="closeModal" style="position:absolute;top:10px;right:15px;font-size:20px;cursor:pointer;">&times;</span>
+    <h3 style="margin-top:0">Scan to Pay</h3>
+    <div id="qrModalContent" style="display:flex;justify-content:center;margin-bottom:10px"></div>
+    <div id="qrMeta" style="font-size:.9rem;word-break:break-all"></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button id="copyUri" class="btn" style="color:#0b1420;background:#e5f6ff;border-color:#bdefff">Copy Payment URI</button>
+      <button id="copyTrc" class="btn" style="color:#0b1420;background:#e9ffe5;border-color:#c7ffd0">Copy TRC20</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+<script>
+  // =========================================================================
+  // =========================================================================
+  const firebaseConfig = {
+  apiKey: "AIzaSyD8wj92qGQ5uHuP6LYB8MOafRt4ZUCxzXE",
+  authDomain: "flashusdt-sale.firebaseapp.com",
+  projectId: "flashusdt-sale",
+  storageBucket: "flashusdt-sale.firebasestorage.app",
+  messagingSenderId: "1029037046995",
+  appId: "1:1029037046995:web:785f65adb7e824869c6826"
+};
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const TREASURY = "0x81Dcf6Fe05e41dC3ba5586bC6836fc7eB56D3F8d";
+
+  // Centered toast-like modal
+  const Alert = {
+    node: null,
+    open(type, title, msg){
+      if(!this.node){
+        const root = document.createElement('div');
+        root.style.cssText = 'position:fixed;inset:0;display:grid;place-items:center;background:rgba(3,10,20,.6);backdrop-filter:blur(5px);z-index:9999;';
+        root.id='alert-root';
+        root.innerHTML = `
+          <div id="alert-card" style="width:min(520px,92vw);border-radius:18px;padding:18px;border:1px solid rgba(255,255,255,.2);
+            background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.9));color:#0b1420;box-shadow:0 26px 80px rgba(0,0,0,.45)">
+            <div style="font-weight:900;font-size:1.1rem;margin-bottom:6px" id="alert-title"></div>
+            <div style="white-space:pre-line;line-height:1.35" id="alert-msg"></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:12px">
+              <button id="alert-ok" style="cursor:pointer;border:0;padding:10px 14px;border-radius:10px;font-weight:800;background:#111827;color:#fff">OK</button>
+            </div>
+          </div>`;
+        document.body.appendChild(root);
+        root.addEventListener('click',(e)=>{ if(e.target===root) this.close(); });
+        document.getElementById('alert-ok').addEventListener('click', ()=> this.close());
+        this.node = root;
+      }
+      const card = document.getElementById('alert-card');
+      card.style.borderColor = type==='success' ? 'rgba(30,226,162,.5)' :
+                               type==='error'    ? 'rgba(255,107,129,.55)' :
+                                                     'rgba(255,211,105,.6)';
+      document.getElementById('alert-title').textContent = title;
+      document.getElementById('alert-msg').textContent = msg;
+      this.node.style.display='grid';
+    },
+    close(){ if(this.node) this.node.style.display='none'; }
+  };
+
+  const $ = (s)=>document.querySelector(s);
+  const $$ = (s)=>document.querySelectorAll(s);
+  const fmt = (n)=> Number(n).toLocaleString('en-US',{maximumFractionDigits:6});
+  const tronRegex = /^T[1-9A-HJ-NP-Za-km-z]{25,34}$/; // Base58Check-like quick check
+  const isLikelyTron = (a)=> typeof a==='string' && tronRegex.test(a.trim());
+
+  let provider=null, signer=null, currentAccount=null, connectInFlight=false;
+
+  function getMetaMaskProvider(){
+    const eth = window.ethereum;
+    if(!eth) return null;
+    if(eth.providers && Array.isArray(eth.providers)){
+      const mm = eth.providers.find(p=>p.isMetaMask);
+      return mm || eth.providers[0];
+    }
+    return eth.isMetaMask ? eth : null;
+  }
+
+  function bindProviderEvents(p){
+    if(!p || !p.on) return;
+    p.on('accountsChanged', (a)=>{ if(a && a[0]) refresh(); else disconnect(); });
+    p.on('chainChanged', ()=> refresh());
+    p.on('disconnect', ()=> disconnect());
+  }
+
+  async function getAuthorizedAccounts(){
+    try{
+      const eth = window.ethereum;
+      if(!eth) return [];
+      const accs = await eth.request({ method:'eth_accounts' });
+      const sel  = eth.selectedAddress ? [eth.selectedAddress] : [];
+      return Array.from(new Set([...(accs||[]), ...sel])).filter(Boolean);
+    }catch{ return []; }
+  }
+
+  async function connectMetaMask(){
+    if(connectInFlight) return; connectInFlight = true;
+
+    try{
+      const injected = getMetaMaskProvider();
+      if(!injected){ Alert.open('error','MetaMask not found','Install/enable MetaMask extension.'); return; }
+
+      const already = await getAuthorizedAccounts();
+      provider = new ethers.providers.Web3Provider(injected);
+      bindProviderEvents(injected);
+
+      if(already.length===0){
+        try{ await provider.send('eth_requestAccounts', []); }
+        catch(e){
+          if(e?.code === -32002)     Alert.open('warn','Request Pending','Please complete the pending connection request in MetaMask.');
+          else if(e?.code === 4001)  Alert.open('error','User Rejected','Connection was rejected.');
+          else                       Alert.open('error','Connection Error', e?.data?.message || e?.message || 'Unknown error');
+          return;
+        }
+      }
+      signer = provider.getSigner();
+      $('#disconnectBtn').disabled = false;
+      await refresh(true,'Wallet connected.');
+    }finally{ connectInFlight=false; }
+  }
+
+  async function ensureMainnet(){
+    try{
+      const net = await provider.getNetwork();
+      if(net.chainId === 1){ return true; }
+      try{
+        await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{ chainId:'0x1' }] });
+        return true;
+      }catch{
+        Alert.open('warn','Wrong Network','Please switch to Ethereum Mainnet to continue.');
+        return false;
+      }
+    }catch{
+      Alert.open('error','Network Error','Cannot detect current network.');
+      return false;
+    }
+  }
+
+  async function refresh(show=false,msg=''){
+    try{
+      const addr = await signer.getAddress();
+      currentAccount = addr;
+      $('#addr').textContent = addr;
+
+      const net = await provider.getNetwork();
+      const onNet = net.chainId===1;
+      $('#chain').textContent = onNet ? 'Ethereum Mainnet' : `ChainId: ${net.chainId} (not Mainnet)`;
+      $('#netInfo').textContent = onNet ? 'Mainnet' : `Not Mainnet (ChainId ${net.chainId})`;
+      setBuyEnabled(onNet);
+      if(!onNet) Alert.open('warn','Wrong Network','Please switch to Ethereum Mainnet to proceed.');
+
+      const bal = await provider.getBalance(addr);
+      $('#ethbal').textContent = fmt(ethers.utils.formatEther(bal)) + ' ETH';
+      $('#status').textContent = show ? msg : 'Wallet connected';
+    }catch(e){ console.error(e); $('#status').textContent = 'Connection error'; }
+  }
+
+  function setBuyEnabled(on){
+    // Only MetaMask buttons depend on network connection
+    $$('.buy-mm').forEach(b=>{ b.disabled = !on; b.title = on ? '' : 'Please switch to Ethereum Mainnet'; });
+  }
+
+  function disconnect(){
+    signer=null; provider=null; currentAccount=null;
+    $('#addr').textContent='-'; $('#chain').textContent='-'; $('#ethbal').textContent='-';
+    $('#netInfo').textContent='Not connected'; $('#status').textContent='Disconnected';
+    $('#disconnectBtn').disabled = true;
+    setBuyEnabled(false);
+    Alert.open('warn','Disconnected','Wallet has been disconnected.');
+  }
+
+  async function buy(packageId, ethAmount){
+    if(!signer){ Alert.open('error','Not Connected','Please connect your wallet first.'); return; }
+    if(!(await ensureMainnet())) return;
+
+    const trc = $('#trc20').value.trim();
+    if(!isLikelyTron(trc)){
+      Alert.open('warn','TRC20 Address Required','Enter a valid TRC20 (starts with T…) for manual delivery.');
+      return;
+    }
+    try{
+      const tx = await signer.sendTransaction({ to: TREASURY, value: ethers.utils.parseEther(String(ethAmount)) });
+      $('#status').textContent = 'Transaction submitted… waiting confirmation';
+      Alert.open('warn','Pending','Transaction submitted. Waiting for confirmation…');
+
+      const r = await tx.wait();
+      if(r.status===1){
+        $('#status').textContent = 'Payment successful';
+        Alert.open('success','Payment Successful', `Package ${packageId} purchased.\nTx: ${r.transactionHash}\nTRC20: ${trc}`);
+        console.log({packageId, trc20: trc, tx: r.transactionHash});
+        
+        let decreaseAmount = 0;
+        if (packageId === '1') {
+          decreaseAmount = 50000;
+        } else if (packageId === '2') {
+          decreaseAmount = 100000;
+        } else if (packageId === '3') {
+          decreaseAmount = 150000;
+        }
+        if (decreaseAmount > 0) {
+          await decreaseStock(decreaseAmount);
+        }
+      }else{
+        $('#status').textContent = 'Transaction reverted';
+        Alert.open('error','Reverted','The transaction was reverted by EVM.');
+      }
+    }catch(e){
+      console.error(e);
+      if(e?.code===4001)     Alert.open('error','Rejected','Transaction rejected by the user.');
+      else if(e?.code===-32000) Alert.open('error','Insufficient Funds','Cüzdanda yeterli ETH yok. İşlem için bakiye yetersiz.');
+      else                       Alert.open('error','Transaction Error', e?.data?.message || e?.message || 'Unknown error');
+      $('#status').textContent = 'Transaction error';
+    }
+  }
+
+  // Firebase ile stok barı yönetimi
+  const initialMaxStock = 3628387000;
+  const stockCollection = db.collection('stoklar');
+  const stockDocRef = stockCollection.doc('usdt-stok');
+
+  const stockValueEl = document.getElementById("stockValue");
+  const stockPercentEl = document.getElementById("stockPercent");
+  const stockFillEl = document.getElementById("stockFill");
+  const stockNoteEl = document.getElementById("stockNote");
+
+  // Firebase'den anlık stok verisini dinler.
+  stockDocRef.onSnapshot(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+      const currentStock = data.miktar;
+      updateStockBar(currentStock);
+    } else {
+      // Eğer Firestore'da stok belgesi yoksa, varsayılan değeri oluşturur.
+      stockDocRef.set({ miktar: initialMaxStock });
+      updateStockBar(initialMaxStock);
+    }
+  }, err => {
+    console.error("Firestore'dan veri alınırken hata oluştu:", err);
+  });
+
+  // Stok barını güncelleyen fonksiyon
+  function updateStockBar(currentStock) {
+    const percent = (currentStock / initialMaxStock) * 100;
+    stockValueEl.textContent = currentStock.toLocaleString("en-US");
+    stockPercentEl.textContent = Math.max(0, percent).toFixed(2) + "%";
+    stockFillEl.style.width = Math.max(0, percent) + "%";
+  }
+
+  // Stok miktarını düşüren işlem.
+  // Bu fonksiyon hem otomatik azalma hem de satın alma butonu için kullanılır.
+  async function decreaseStock(amount) {
+      const docRef = stockDocRef;
+      try {
+          await db.runTransaction(async (transaction) => {
+              const doc = await transaction.get(docRef);
+              if (!doc.exists) {
+                  console.error("Stok belgesi bulunamadı!");
+                  return;
+              }
+
+              const currentStock = doc.data().miktar;
+              let newStock = currentStock - amount;
+              if (newStock < 0) {
+                  newStock = 0;
+              }
+
+              transaction.update(docRef, { miktar: newStock });
+              
+              const time = new Date().toLocaleTimeString();
+              const noteDiv = document.createElement("div");
+              noteDiv.textContent = `${time} - Transaction executed (-${amount.toLocaleString()} USDT)`;
+              stockNoteEl.prepend(noteDiv);
+              while(stockNoteEl.childNodes.length > 5){
+                stockNoteEl.removeChild(stockNoteEl.lastChild);
+              }
+          });
+          console.log("Stok başarıyla güncellendi.");
+      } catch (e) {
+          console.error("Stok güncelleme işlemi başarısız oldu: ", e);
+      }
+  }
+
+const transactions = [
+    { amount: 50000, delay: 116000 },
+    { amount: 50000, delay: 149000 },
+    { amount: 150000, delay: 177000 },
+    { amount: 100000, delay: 161000 },
+    { amount: 50000, delay: 194000 },
+    { amount: 50000, delay: 136000 },
+    { amount: 50000, delay: 148000 },
+    { amount: 50000, delay: 188000 },
+    { amount: 100000, delay: 211000 },
+    { amount: 100000, delay: 177000 },
+    { amount: 50000, delay: 194000 },
+    { amount: 150000, delay: 177000 },
+    { amount: 50000, delay: 149000 },
+    { amount: 50000, delay: 188000 },
+    { amount: 50000, delay: 194000 }
+];
+
+let transactionIndex = 0; 
+
+/**
+ * Belirlenmiş sırayla stok azaltma işlemlerini döngüsel olarak yürütür.
+ */
+function startAutoDecrease() {
+    // İşlem listesi bittiğinde, sayacı sıfırlayarak en başa döner.
+    if (transactionIndex >= transactions.length) {
+        transactionIndex = 0;
+        console.log;
+    }
+
+    const currentTransaction = transactions[transactionIndex];
+    const amountToDecrease = currentTransaction.amount;
+    const delayMilliseconds = currentTransaction.delay;
+
+    // decreaseStock adında bir fonksiyonun var olduğunu varsayıyoruz.
+    // Bu fonksiyon stoğu gerçekten azaltmalıdır.
+    decreaseStock(amountToDecrease);
+
+    // İşlem detaylarını konsola yazdırır.
+    console.log(`Azalma: ${amountToDecrease} USDT, Gecikme: ${delayMilliseconds / 1000} saniye`);
+
+    // Bir sonraki işleme geçer.
+    transactionIndex++;
+
+    // Belirlenen süre kadar bekler ve fonksiyonu tekrar çağırır.
+    setTimeout(startAutoDecrease, delayMilliseconds);
+}
+  // ===== QR + VALIDATION (Direct Pay) =====
+  document.addEventListener('DOMContentLoaded', () => {
+    // Validation binders for all TRC20 inputs
+    const inputs = ['#trc20', '#trc20-qr-1', '#trc20-qr-2', '#trc20-qr-3'];
+    
+    // Force all QR buttons disabled at start until TRC20 is valid
+    [1,2,3].forEach(i => {
+      const btn = document.getElementById('buy-qr-' + i);
+      if(btn) btn.disabled = true;
+    });
+
+    inputs.forEach(sel => {
+      const el = document.querySelector(sel);
+      if(!el) return;
+      const help = document.getElementById(el.id + '-help');
+      const apply = () => {
+        const v = el.value.trim();
+        if(!v){
+          el.classList.remove('valid','invalid');
+          if(help){ help.textContent=''; help.className='help'; }
+        }else if(isLikelyTron(v)){
+          el.classList.add('valid'); el.classList.remove('invalid');
+          if(help){ help.textContent='Valid TRC20 address ✓'; help.className='help ok'; }
+        }else{
+          el.classList.add('invalid'); el.classList.remove('valid');
+          if(help){ help.textContent='Valid TRC20 address. T starts with, 26–35 characters.'; help.className='help err'; }
+        }
+        // Enable/disable QR buttons by validity
+        const id = el.id.match(/trc20-qr-(\d)/)?.[1];
+        if(id){
+          const btn = document.getElementById('buy-qr-' + id);
+          if(btn) btn.disabled = !isLikelyTron(v);
+        }
+      };
+      el.addEventListener('input', apply);
+      apply();
+    });
+
+    // QR buttons: open modal with dynamic QR including amount + message (TRC20)
+    [1,2,3].forEach(i=>{
+      const btn = document.getElementById('buy-qr-' + i);
+      const input = document.getElementById('trc20-qr-' + i);
+      if(!btn || !input) return;
+      btn.addEventListener('click', ()=>{
+        const trc = (input.value||'').trim();
+        if(!isLikelyTron(trc)) return; // safety
+        const ethAmount = btn.dataset.eth;
+        const wei = ethers.utils.parseEther(String(ethAmount)).toString();
+        const uri = TREASURY;
+
+        // Build QR freshly each time
+        const qrWrap = document.createElement('div');
+        const qrContent = document.getElementById('qrModalContent');
+        qrContent.innerHTML = ''; // clear previous QR
+        qrContent.innerHTML = '';
+        new QRCode(qrContent, { text: uri, width: 200, height: 200 });
+        document.getElementById('qrMeta').innerHTML = `<div style="margin-top:6px;font-weight:900;text-align:center;">ERC20 - NETWORK</div>`;
+
+        // expose for copy buttons
+        document.getElementById('copyUri').dataset.clip = TREASURY;
+        document.getElementById('copyTrc').dataset.clip = trc;
+
+        console.log("QR modal opened");
+        document.getElementById('qrModal').style.display = 'flex';
+      });
+    });
+
+    // Modal close
+    document.getElementById('closeModal').addEventListener('click', ()=>{
+      document.getElementById('qrModal').style.display = 'none';
+    });
+    document.getElementById('qrModal').addEventListener('click', (e)=>{
+      if(e.target.id === 'qrModal') document.getElementById('qrModal').style.display = 'none';
+    });
+
+    // Copy helpers
+    function copyFrom(btn){
+      const txt = btn.dataset.clip || '';
+      if(!txt) return;
+      navigator.clipboard.writeText(txt).then(()=>{
+        btn.textContent = btn.id==='copyUri' ? 'Copied ✓' : 'Copied ✓';
+        setTimeout(()=>{ btn.textContent = btn.id==='copyUri' ? 'Copy Payment URI' : 'Copy TRC20'; }, 1200);
+      }).catch(()=>{
+        Alert.open('warn','Copy Failed','Clipboard is not available in this context.');
+      });
+    }
+    document.getElementById('copyUri').addEventListener('click', (e)=> copyFrom(e.currentTarget));
+    document.getElementById('copyTrc').addEventListener('click', (e)=> copyFrom(e.currentTarget));
+
+    // Bind MetaMask flows
+    document.getElementById('connectBtn').addEventListener('click', connectMetaMask);
+    document.getElementById('disconnectBtn').addEventListener('click', disconnect);
+    $$('.buy-mm').forEach(btn=> btn.addEventListener('click', ()=> buy(btn.dataset.id, btn.dataset.eth)));
+    setBuyEnabled(false); // initial
+
+    // Otomatik azalma işlemini başlat.
+    startAutoDecrease();
+  });
+</script>
+</body>
+</html>
